@@ -695,14 +695,24 @@ int model::sampling(int m, int n, int& sentiLab, int& topic) {
 	nl[sentiLab]--; // k: exclude word n's assignment of sentiment label 
 
 	// do multinomial sampling via cumulative method
+	// for (int l = 0; l < numSentiLabs; l++) {
+	// 	for (int k = 0; k < numTopics; k++) {
+	// 		p[l][k] = (nlzw[l][k][w] + beta_lzw[l][k][w]) / (nlz[l][k] + betaSum_lz[l][k]) *
+	// 	   		(ndlz[m][l][k] + alpha_lz[l][k]) / (ndl[m][l] + alphaSum_l[l]) *
+	// 			(ndl[m][l] + gamma_dl[m][l]) / (nd[m] + gammaSum_d[m]);
+	// 	}
+	// }
+	
+	// k: change post-prob to tying-JST with new theta_lz
 	for (int l = 0; l < numSentiLabs; l++) {
 		for (int k = 0; k < numTopics; k++) {
 			p[l][k] = (nlzw[l][k][w] + beta_lzw[l][k][w]) / (nlz[l][k] + betaSum_lz[l][k]) *
-		   		(ndlz[m][l][k] + alpha_lz[l][k]) / (ndl[m][l] + alphaSum_l[l]) *
+		   		(nlz[l][k] + alpha_lz[l][k]) / (nl[l] + alphaSum_l[l]) *
 				(ndl[m][l] + gamma_dl[m][l]) / (nd[m] + gammaSum_d[m]);
 		}
 	}
-	
+
+
 	// accumulate multinomial parameters
 	for (int l = 0; l < numSentiLabs; l++)  {
 		for (int k = 0; k < numTopics; k++) {
@@ -746,6 +756,49 @@ int model::sampling(int m, int n, int& sentiLab, int& topic) {
 }
 
 
+// int model::update_Parameters() {
+
+// 	int ** data; // temp valuable for exporting 3-dimentional array to 2-dimentional
+// 	double * alpha_temp;
+// 	data = new int*[numTopics];
+// 	for (int k = 0; k < numTopics; k++) {
+// 		data[k] = new int[numDocs];
+// 		for (int m = 0; m < numDocs; m++) {
+// 			data[k][m] = 0;
+// 		}
+// 	}
+
+// 	alpha_temp = new double[numTopics];
+// 	for (int k = 0; k < numTopics; k++){
+// 		alpha_temp[k] = 0.0;
+// 	}
+
+// 	// update alpha
+// 	for (int j = 0; j < numSentiLabs; j++) {
+// 		for (int k = 0; k < numTopics; k++) {
+// 			for (int m = 0; m < numDocs; m++) {
+// 				data[k][m] = ndlz[m][j][k]; // ntldsum[j][k][m];
+// 			}
+// 		}
+
+// 		for (int k = 0; k < numTopics; k++) {
+// 			alpha_temp[k] =  alpha_lz[j][k]; //alpha[j][k];
+// 		}
+
+// 		polya_fit_simple(data, alpha_temp, numTopics, numDocs);
+
+// 		// update alpha
+// 		alphaSum_l[j] = 0.0;
+// 		for (int k = 0; k < numTopics; k++) {
+// 			alpha_lz[j][k] = alpha_temp[k];
+// 			alphaSum_l[j] += alpha_lz[j][k];
+// 		}
+// 	}
+	
+// 	return 0;
+// }
+
+// k: modifying for tying-JST
 int model::update_Parameters() {
 
 	int ** data; // temp valuable for exporting 3-dimentional array to 2-dimentional
@@ -767,7 +820,7 @@ int model::update_Parameters() {
 	for (int j = 0; j < numSentiLabs; j++) {
 		for (int k = 0; k < numTopics; k++) {
 			for (int m = 0; m < numDocs; m++) {
-				data[k][m] = ndlz[m][j][k]; // ntldsum[j][k][m];
+				data[k][m] = nlz[j][k]; // ntldsum[j][k][m];
 			}
 		}
 
