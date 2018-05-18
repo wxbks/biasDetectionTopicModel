@@ -611,7 +611,7 @@ int model::init_estimate() {
 
 			}
 			else {
-			    sentiLab = (int)(((double)rand() / RAND_MAX) * numSentiLabs);
+			  sentiLab = (int)(((double)rand() / RAND_MAX) * numSentiLabs); // k: randomly genated a sentiLab
 			    if (sentiLab == numSentiLabs) sentiLab = numSentiLabs -1;  // to avoid over array boundary
 			}
     	    l[m][t] = sentiLab;
@@ -716,7 +716,7 @@ int model::sampling(int m, int n, int& sentiLab, int& topic) {
 
 	// probability normalization
 	u = ((double)rand() / RAND_MAX) * p[numSentiLabs-1][numTopics-1];
-
+	
 	// sample sentiment label l, where l \in [0, S-1]
 	bool loopBreak=false;
 	for (sentiLab = 0; sentiLab < numSentiLabs; sentiLab++) {   

@@ -71,7 +71,7 @@ public:
 	
 	int read_dataStream(ifstream& fin);
 	int read_newData(string filename);
-	int read_senti_lexicon(string sentiLexiconFileDir);
+	/* int read_senti_lexicon(string sentiLexiconFileDir); */ // k: disable for wiki corpus bias 
 	int analyzeCorpus(vector<string>& docs);
 
 	static int write_wordmap(string wordmapfile, mapword2atr& pword2atr);
